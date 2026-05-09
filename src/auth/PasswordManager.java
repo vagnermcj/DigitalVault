@@ -17,7 +17,26 @@ public class PasswordManager {
     }
 
     public static boolean isValidPasswordFormat(String password) {
-        // TODO: Validar 8-10 dígitos, sem repetições
-        return false;
+        // Verifica tamanho
+        if (password.length() < 8 || password.length() > 10) {
+            return false;
+        }
+
+        // Verifica se são apenas dígitos
+        if (!password.matches("\\d+")) {
+            return false;
+        }
+
+        // Verifica sequências repetidas (ex: 11111111)
+        char firstChar = password.charAt(0);
+        boolean allSame = true;
+        for (int i = 1; i < password.length(); i++) {
+            if (password.charAt(i) != firstChar) {
+                allSame = false;
+                break;
+            }
+        }
+
+        return !allSame;
     }
 }

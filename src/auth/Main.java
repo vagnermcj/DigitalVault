@@ -3,9 +3,9 @@ package auth;
 public class Main {
     public static void main(String[] args) {
         try {
-            // Teste TOTP
+            // Teste TOTP com chave válida de 20 bytes
             System.out.println("=== TESTE TOTP ===");
-            String secret = "JBSWY3DPEHPK3PXP"; // Chave de teste
+            String secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ";
             TOTP totp = new TOTP(secret, 30);
 
             String code = totp.generateCode();
@@ -16,15 +16,12 @@ public class Main {
             System.out.println("\n=== TESTE BCRYPT ===");
             String senha = "12345678";
 
-            // Validar formato
             System.out.println("Formato válido: " +
                     PasswordManager.isValidPasswordFormat(senha));
 
-            // Gerar hash
             String hash = PasswordManager.hashPassword(senha);
             System.out.println("Hash gerado: " + hash);
 
-            // Validar senha
             System.out.println("Senha correta: " +
                     PasswordManager.checkPassword(senha, hash));
             System.out.println("Senha errada: " +
