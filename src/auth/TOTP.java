@@ -2,8 +2,7 @@ package auth;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.ByteBuffer;
-import java.security.SecureRandom;
+import java.util.Date;
 
 public class TOTP {
     private byte[] key = null;
@@ -13,8 +12,6 @@ public class TOTP {
     public TOTP(String base32EncodedSecret, long timeStepInSeconds) throws Exception {
         this.timeStepInSeconds = timeStepInSeconds;
         this.base32 = new Base32(Base32.Alphabet.BASE32, false, false);
-
-        // Decodificar BASE32
         this.key = base32.fromString(base32EncodedSecret);
 
         if (this.key == null || this.key.length != 20) {
@@ -31,7 +28,6 @@ public class TOTP {
                 (hash[offset + 3] & 0xFF);
 
         int otp = binary % 1000000;
-
         return String.format("%06d", otp);
     }
 
@@ -47,25 +43,24 @@ public class TOTP {
     }
 
     private String TOTPCode(long timeInterval) {
-        // Converter timeInterval para 8 bytes (big-endian)
-        ByteBuffer buffer = ByteBuffer.allocate(8);
-        buffer.putLong(timeInterval);
-        byte[] counter = buffer.array();
+        byte[] counter = new byte[8];
+        for (int i = 7; i >= 0; i--) {
+            counter[i] = (byte) (timeInterval & 0xFF);
+            timeInterval >>= 8;
+        }
 
-        // Calcular HMAC-SHA1
         byte[] hash = HMAC_SHA1(counter, this.key);
-
-        // Extrair código TOTP
         return getTOTPCodeFromHash(hash);
     }
 
     public String generateCode() {
-        long timeInterval = System.currentTimeMillis() / 1000 / timeStepInSeconds;
+        // Usar Date para obter timestamp atual
+        long timeInterval = new Date().getTime() / 1000 / timeStepInSeconds;
         return TOTPCode(timeInterval);
     }
 
     public boolean validateCode(String inputTOTP) {
-        long currentInterval = System.currentTimeMillis() / 1000 / timeStepInSeconds;
+        long currentInterval = new Date().getTime() / 1000 / timeStepInSeconds;
 
         String code0 = TOTPCode(currentInterval - 1);
         String code1 = TOTPCode(currentInterval);
@@ -74,14 +69,5 @@ public class TOTP {
         return inputTOTP.equals(code0) ||
                 inputTOTP.equals(code1) ||
                 inputTOTP.equals(code2);
-    }
-
-    public static String genRandomKey() {
-        SecureRandom random = new SecureRandom();
-        byte[] RandKey = new byte[20]; // 160 bits
-        random.nextBytes(RandKey);
-
-        Base32 base32 = new Base32(Base32.Alphabet.BASE32, false, false);
-        return base32.toString(RandKey);
     }
 }
