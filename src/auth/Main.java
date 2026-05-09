@@ -21,6 +21,7 @@ public class Main {
 
             String hash = PasswordManager.hashPassword(senha);
             System.out.println("Hash gerado: " + hash);
+            System.out.println("Tamanho do hash: " + hash.length());
 
             System.out.println("Senha correta: " +
                     PasswordManager.checkPassword(senha, hash));
