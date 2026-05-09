@@ -22,18 +22,44 @@ public class TOTP {
     }
 
     private String getTOTPCodeFromHash(byte[] hash) {
-        // TODO: Implementar Dynamic Truncation
-        return null;
+        // Pega último nibble como offset
+        int offset = hash[hash.length - 1] & 0x0F;
+
+        // Extrai 4 bytes começando no offset
+        int binary = ((hash[offset] & 0x7F) << 24) |
+                ((hash[offset + 1] & 0xFF) << 16) |
+                ((hash[offset + 2] & 0xFF) << 8) |
+                (hash[offset + 3] & 0xFF);
+
+        // Módulo 1.000.000 para 6 dígitos
+        int otp = binary % 1000000;
+
+        // Preenche com zeros à esquerda
+        return String.format("%06d", otp);
     }
 
     private byte[] HMAC_SHA1(byte[] counter, byte[] keyByteArray) {
-        // TODO: Implementar HMAC-SHA1
-        return null;
+        try {
+            Mac mac = Mac.getInstance("HmacSHA1");
+            SecretKeySpec keySpec = new SecretKeySpec(keyByteArray, "HmacSHA1");
+            mac.init(keySpec);
+            return mac.doFinal(counter);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro HMAC-SHA1", e);
+        }
     }
 
     private String TOTPCode(long timeInterval) {
-        // TODO: Implementar geração do código
-        return null;
+        // Converter timeInterval para 8 bytes (big-endian)
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.putLong(timeInterval);
+        byte[] counter = buffer.array();
+
+        // Calcular HMAC-SHA1
+        byte[] hash = HMAC_SHA1(counter, this.key);
+
+        // Extrair código TOTP
+        return getTOTPCodeFromHash(hash);
     }
 
     public String generateCode() {
@@ -42,7 +68,15 @@ public class TOTP {
     }
 
     public boolean validateCode(String inputTOTP) {
-        // TODO: Implementar validação com margem ±30s
-        return false;
+        long currentInterval = System.currentTimeMillis() / 1000 / timeStepInSeconds;
+
+        // Gera 3 códigos: atual, -30s, +30s
+        String code0 = TOTPCode(currentInterval - 1);
+        String code1 = TOTPCode(currentInterval);
+        String code2 = TOTPCode(currentInterval + 1);
+
+        return inputTOTP.equals(code0) ||
+                inputTOTP.equals(code1) ||
+                inputTOTP.equals(code2);
     }
 }
