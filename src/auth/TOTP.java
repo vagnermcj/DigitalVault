@@ -3,6 +3,7 @@ package auth;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 
 public class TOTP {
     private byte[] key = null;
@@ -22,19 +23,15 @@ public class TOTP {
     }
 
     private String getTOTPCodeFromHash(byte[] hash) {
-        // Pega último nibble como offset
         int offset = hash[hash.length - 1] & 0x0F;
 
-        // Extrai 4 bytes começando no offset
         int binary = ((hash[offset] & 0x7F) << 24) |
                 ((hash[offset + 1] & 0xFF) << 16) |
                 ((hash[offset + 2] & 0xFF) << 8) |
                 (hash[offset + 3] & 0xFF);
 
-        // Módulo 1.000.000 para 6 dígitos
         int otp = binary % 1000000;
 
-        // Preenche com zeros à esquerda
         return String.format("%06d", otp);
     }
 
@@ -70,7 +67,6 @@ public class TOTP {
     public boolean validateCode(String inputTOTP) {
         long currentInterval = System.currentTimeMillis() / 1000 / timeStepInSeconds;
 
-        // Gera 3 códigos: atual, -30s, +30s
         String code0 = TOTPCode(currentInterval - 1);
         String code1 = TOTPCode(currentInterval);
         String code2 = TOTPCode(currentInterval + 1);
@@ -78,5 +74,14 @@ public class TOTP {
         return inputTOTP.equals(code0) ||
                 inputTOTP.equals(code1) ||
                 inputTOTP.equals(code2);
+    }
+
+    public static String genRandomKey() {
+        SecureRandom random = new SecureRandom();
+        byte[] RandKey = new byte[20]; // 160 bits
+        random.nextBytes(RandKey);
+
+        Base32 base32 = new Base32(Base32.Alphabet.BASE32, false, false);
+        return base32.toString(RandKey);
     }
 }
