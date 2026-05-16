@@ -12,33 +12,12 @@ import java.util.Base64;
 
 public class CadastroService {
 
-    public static boolean validatePrivateKey(
-            PrivateKey privateKey,
-            PublicKey publicKey
-    ) throws Exception {
-
-        byte[] randomData = new byte[9216];
-
-        new java.security.SecureRandom().nextBytes(randomData);
-
-        byte[] signature =
-                SignatureService.sign(randomData, privateKey);
-
-        return SignatureService.verify(
-                randomData,
-                signature,
-                publicKey
-        );
-    }
-
     public void cadastrar(
             String certPath,
             String privateKeyPath,
             String secretPhrase,
             String senha
     ) throws Exception {
-
-
 
         X509Certificate cert =
                 CertificateService.loadCertificate(certPath);
@@ -52,7 +31,7 @@ public class CadastroService {
                         secretPhrase
                 );
 
-        boolean valid = validatePrivateKey(
+        boolean valid = SignatureService.validatePrivateKey(
                 privateKey,
                 publicKey
         );

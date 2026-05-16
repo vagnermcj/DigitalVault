@@ -1,9 +1,9 @@
 package database.dao;
 
 import config.DatabaseConfig;
+import database.entity.Usuario;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.sql.*;
 
 public class UsuarioDAO {
 
@@ -40,6 +40,96 @@ public class UsuarioDAO {
             stmt.setInt(6, kid);
 
             stmt.executeUpdate();
+        }
+    }
+
+    public Usuario findByLogin(String login)
+            throws Exception {
+
+        try (Connection conn = DatabaseConfig.getConnection()) {
+
+            PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT * FROM Usuarios WHERE login = ?"
+            );
+
+            stmt.setString(1, login);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (!rs.next()) {
+                return null;
+            }
+
+            Usuario usuario = new Usuario();
+
+            usuario.setUid(rs.getInt("uid"));
+            usuario.setLogin(rs.getString("login"));
+            usuario.setNome(rs.getString("nome"));
+            usuario.setGid(rs.getInt("gid"));
+            usuario.setSenhaHash(rs.getString("senha_hash"));
+
+            usuario.setTotpSecretEncrypted(
+                    rs.getString("totp_secret_encrypted")
+            );
+
+            usuario.setKid(rs.getInt("kid"));
+
+            usuario.setErrosSenha(rs.getInt("erros_senha"));
+            usuario.setErrosTotp(rs.getInt("erros_totp"));
+            usuario.setTotalAcessos(rs.getInt("total_acessos"));
+
+            usuario.setBloqueadoAte(
+                    rs.getTimestamp("bloqueado_ate")
+            );
+
+            usuario.setGrupoNome(
+                    usuario.getGid() == 1
+                            ? "Administrador"
+                            : "Usuário"
+            );
+
+            return usuario;
+        }
+    }
+
+    public void update(Usuario usuario)
+            throws Exception {
+
+        try (Connection conn = DatabaseConfig.getConnection()) {
+
+            PreparedStatement stmt = conn.prepareStatement(
+                    """
+                    UPDATE Usuarios
+                    SET bloqueado_ate = ?,
+                        erros_senha = ?,
+                        erros_totp = ?,
+                        total_acessos = ?
+                    WHERE uid = ?
+                    """
+            );
+
+            stmt.setTimestamp(1, usuario.getBloqueadoAte());
+            stmt.setInt(2, usuario.getErrosSenha());
+            stmt.setInt(3, usuario.getErrosTotp());
+            stmt.setInt(4, usuario.getTotalAcessos());
+            stmt.setInt(5, usuario.getUid());
+
+            stmt.executeUpdate();
+        }
+    }
+
+    public boolean existsAnyUser()
+            throws Exception {
+
+        try (Connection conn = DatabaseConfig.getConnection()) {
+
+            Statement stmt = conn.createStatement();
+
+            ResultSet rs = stmt.executeQuery(
+                    "SELECT COUNT(*) FROM Usuarios"
+            );
+
+            return rs.next() && rs.getInt(1) > 0;
         }
     }
 }

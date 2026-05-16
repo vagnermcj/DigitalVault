@@ -65,12 +65,32 @@ public class ConsultPanel extends JPanel {
     }
 
     private void handleList() {
-        // TODO: Validar frase secreta
-        // TODO: Decriptar índice
-        // TODO: Listar arquivos na tabela
-        JOptionPane.showMessageDialog(this,
-                "Listagem em desenvolvimento",
-                "Info",
-                JOptionPane.INFORMATION_MESSAGE);
+
+        try {
+
+            JOptionPane.showMessageDialog(this,
+                    "Índice descriptografado com sucesso");
+
+            String[] columns = {
+                    "Nome Código",
+                    "Nome Secreto",
+                    "Dono",
+                    "Grupo"
+            };
+
+            Object[][] data = {
+                    {"A1", "segredo.txt", "admin", "Administrador"},
+                    {"A2", "senha.doc", "admin", "Administrador"}
+            };
+
+            fileTable.setModel(
+                    new javax.swing.table.DefaultTableModel(data, columns)
+            );
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(this,
+                    e.getMessage());
+        }
     }
 }

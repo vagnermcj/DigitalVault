@@ -34,4 +34,23 @@ public class SignatureService {
 
         return signature.verify(signed);
     }
+
+    public static boolean validatePrivateKey(
+            PrivateKey privateKey,
+            PublicKey publicKey
+    ) throws Exception {
+
+        byte[] randomData = new byte[9216];
+
+        new java.security.SecureRandom().nextBytes(randomData);
+
+        byte[] signature =
+                SignatureService.sign(randomData, privateKey);
+
+        return SignatureService.verify(
+                randomData,
+                signature,
+                publicKey
+        );
+    }
 }

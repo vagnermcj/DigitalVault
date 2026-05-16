@@ -3,6 +3,7 @@ package gui.panels;
 import gui.MainFrame;
 import javax.swing.*;
 import java.awt.*;
+import service.CadastroService;
 
 public class RegisterPanel extends JPanel {
 
@@ -92,11 +93,39 @@ public class RegisterPanel extends JPanel {
     }
 
     private void handleRegister() {
-        // TODO: Validar campos
-        // TODO: Chamar serviço de cadastro
-        JOptionPane.showMessageDialog(this,
-                "Cadastro em desenvolvimento",
-                "Info",
-                JOptionPane.INFORMATION_MESSAGE);
+
+        try {
+
+            String senha =
+                    new String(txtPassword.getPassword());
+
+            String confirmacao =
+                    new String(txtPasswordConfirm.getPassword());
+
+            if (!senha.equals(confirmacao)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Senhas não coincidem");
+
+                return;
+            }
+
+            CadastroService service = new CadastroService();
+
+            service.cadastrar(
+                    txtCertPath.getText(),
+                    txtKeyPath.getText(),
+                    new String(txtPassphrase.getPassword()),
+                    senha
+            );
+
+            JOptionPane.showMessageDialog(this,
+                    "Usuário cadastrado com sucesso");
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(this,
+                    e.getMessage());
+        }
     }
 }
