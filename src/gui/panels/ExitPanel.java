@@ -1,6 +1,8 @@
 package gui.panels;
 
 import gui.MainFrame;
+import session.RuntimeSession;
+import gui.LoginFrame;
 import javax.swing.*;
 import java.awt.*;
 
@@ -53,10 +55,23 @@ public class ExitPanel extends JPanel {
         add(centerPanel, BorderLayout.CENTER);
     }
 
+    private void disposeWindow() {
+
+        Window window =
+                SwingUtilities.getWindowAncestor(this);
+
+        if (window != null) {
+            window.dispose();
+        }
+    }
+
     private void handleEndSession() {
         // TODO: Encerrar sessão e voltar para tela de autenticação
         JOptionPane.showMessageDialog(this, "Sessão encerrada (mock)");
-        mainFrame.showMainMenu(); // Mock: volta pro menu
+        disposeWindow();
+
+        LoginFrame frame = new LoginFrame();
+        frame.setVisible(true);
     }
 
     private void handleEndSystem() {
@@ -68,6 +83,7 @@ public class ExitPanel extends JPanel {
         );
 
         if (confirm == JOptionPane.YES_OPTION) {
+            RuntimeSession.clear();
             System.exit(0);
         }
     }
