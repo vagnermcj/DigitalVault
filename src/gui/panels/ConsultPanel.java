@@ -10,8 +10,8 @@ import gui.MainFrame;
 
 import service.LogService;
 import service.SecretFolderService;
-import service.UserPrivateKeyValidationService;
-import service.ValidatedUserKeys;
+import service.CadastroService;
+import service.ValidatedCryptoContext;
 
 import session.RuntimeSession;
 
@@ -244,25 +244,68 @@ public class ConsultPanel extends JPanel {
                 return;
             }
 
-            // VALIDAÇÃO OBRIGATÓRIA
+            // FORMULÁRIO IGUAL AO CADASTRO
 
-            ValidatedUserKeys keys =
-                    UserPrivateKeyValidationService
-                            .validate();
+            JTextField txtCert =
+                    new JTextField();
 
-            PrivateKey privateKey =
-                    keys.getPrivateKey();
+            JTextField txtKey =
+                    new JTextField();
 
-            PublicKey publicKey =
-                    keys.getPublicKey();
+            JPasswordField txtPhrase =
+                    new JPasswordField();
+
+            Object[] fields = {
+
+                    "Caminho do certificado digital:",
+                    txtCert,
+
+                    "Caminho da chave privada:",
+                    txtKey,
+
+                    "Frase secreta:",
+                    txtPhrase
+            };
+
+            int option =
+                    JOptionPane.showConfirmDialog(
+                            this,
+                            fields,
+                            "Validação da Chave Privada",
+                            JOptionPane.OK_CANCEL_OPTION
+                    );
+
+            if (option != JOptionPane.OK_OPTION) {
+                return;
+            }
+
+            String certPath =
+                    txtCert.getText();
+
+            String keyPath =
+                    txtKey.getText();
+
+            String phrase =
+                    new String(
+                            txtPhrase.getPassword()
+                    );
+
+            // VALIDAÇÃO EXATAMENTE IGUAL AO CADASTRO
+
+            ValidatedCryptoContext ctx =
+                    CadastroService.validateCredentials(
+                            certPath,
+                            keyPath,
+                            phrase
+                    );
 
             // DECRIPTA ÍNDICE
 
             currentFiles =
                     service.loadIndex(
                             folder,
-                            privateKey,
-                            publicKey
+                            ctx.getPrivateKey(),
+                            ctx.getPublicKey()
                     );
 
             LogService.registrar(
@@ -287,7 +330,7 @@ public class ConsultPanel extends JPanel {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Índice descriptografado com sucesso"
+                    "Índice descriptografado com sucesso."
             );
 
         } catch (Exception e) {

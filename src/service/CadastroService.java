@@ -152,4 +152,46 @@ public class CadastroService {
         Matcher matcher = pattern.matcher(dn);
         return matcher.find() ? matcher.group(1).trim() : null;
     }
+
+    public static ValidatedCryptoContext validateCredentials(
+            String certPath,
+            String privateKeyPath,
+            String secretPhrase
+    ) throws Exception {
+
+        X509Certificate cert =
+                CertificateService.loadCertificate(
+                        certPath
+                );
+
+        PublicKey publicKey =
+                CertificateService.getPublicKey(
+                        cert
+                );
+
+        PrivateKey privateKey =
+                RSAService.loadPrivateKey(
+                        privateKeyPath,
+                        secretPhrase
+                );
+
+        boolean valid =
+                SignatureService.validatePrivateKey(
+                        privateKey,
+                        publicKey
+                );
+
+        if (!valid) {
+
+            throw new Exception(
+                    "Chave privada inválida"
+            );
+        }
+
+        return new ValidatedCryptoContext(
+                privateKey,
+                publicKey,
+                cert
+        );
+    }
 }
