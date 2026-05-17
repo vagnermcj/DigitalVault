@@ -10,6 +10,8 @@ import gui.MainFrame;
 
 import service.LogService;
 import service.SecretFolderService;
+import service.UserPrivateKeyValidationService;
+import service.ValidatedUserKeys;
 
 import session.RuntimeSession;
 
@@ -242,32 +244,23 @@ public class ConsultPanel extends JPanel {
                 return;
             }
 
-            String phrase =
-                    new String(
-                            txtPassphrase.getPassword()
-                    );
+            // VALIDAÇÃO OBRIGATÓRIA
 
-            // CARREGA CHAVE/CERT ADMIN
-
-            X509Certificate cert =
-                    CertificateService.loadCertificate(
-                            "admin.pem"
-                    );
-
-            PublicKey publicKey =
-                    CertificateService.getPublicKey(cert);
+            ValidatedUserKeys keys =
+                    UserPrivateKeyValidationService
+                            .validate();
 
             PrivateKey privateKey =
-                    RSAService.loadPrivateKey(
-                            "admin.bin",
-                            RuntimeSession
-                                    .getAdminSecretPhrase()
-                    );
+                    keys.getPrivateKey();
+
+            PublicKey publicKey =
+                    keys.getPublicKey();
+
+            // DECRIPTA ÍNDICE
 
             currentFiles =
                     service.loadIndex(
                             folder,
-                            phrase,
                             privateKey,
                             publicKey
                     );
@@ -290,6 +283,11 @@ public class ConsultPanel extends JPanel {
                     7009,
                     current.getUid(),
                     null
+            );
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Índice descriptografado com sucesso"
             );
 
         } catch (Exception e) {

@@ -23,7 +23,6 @@ public class SecretFolderService {
 
     public List<SecretFileRecord> loadIndex(
             String folder,
-            String secretPhrase,
             PrivateKey privateKey,
             PublicKey publicKey
     ) throws Exception {
