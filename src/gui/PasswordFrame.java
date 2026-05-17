@@ -73,6 +73,15 @@ public class PasswordFrame extends JFrame {
 
                 return;
             }
+            else if(Objects.equals(valid, "blocked"))
+            {
+                JOptionPane.showMessageDialog(this,
+                        "Tentativas máximas alcançadas! Usuário bloqueado por 2 minutos");
+                LoginFrame frame = new LoginFrame();
+                frame.setVisible(true);
+                dispose();
+                return;
+            }
 
             TOTPFrame frame = new TOTPFrame(
                     usuario,

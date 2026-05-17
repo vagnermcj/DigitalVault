@@ -6,6 +6,9 @@ import service.AuthenticationService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class LoginFrame extends JFrame {
 
@@ -59,12 +62,22 @@ public class LoginFrame extends JFrame {
             );
 
             if (usuario == null) {
-
                 JOptionPane.showMessageDialog(this,
                         "Usuário não encontrado");
 
                 return;
             }
+            else if (usuario.getBloqueadoAte() != null &&
+                    LocalDateTime.now().isBefore(usuario.getBloqueadoAte().toLocalDateTime())) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Usuário está bloqueado!");
+                return;
+            }
+
+            usuario.setBloqueadoAte(null);
+            usuario.setErrosSenha(0);
+            usuario.setErrosTotp(0);
 
             PasswordFrame frame =
                     new PasswordFrame(usuario);
