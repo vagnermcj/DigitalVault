@@ -110,7 +110,7 @@ public class ExitPanel extends JPanel {
         );
 
         if (confirm == JOptionPane.YES_OPTION) {
-            RuntimeSession.clear();
+            RuntimeSession.clearAll();
             System.exit(0);
         }
     }

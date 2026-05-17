@@ -130,21 +130,13 @@ public class AdminSetupFrame extends JFrame {
                     txtCert.getText(),
                     txtKey.getText(),
                     new String(txtPhrase.getPassword()),
-                    password
+                    password,
+                    true
             );
 
             RuntimeSession.setAdminSecretPhrase(
                     new String(txtPhrase.getPassword())
             );
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Administrador cadastrado com sucesso"
-            );
-
-            LoginFrame frame = new LoginFrame();
-
-            frame.setVisible(true);
 
             dispose();
 

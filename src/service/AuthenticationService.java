@@ -5,11 +5,13 @@ import auth.TOTP;
 import database.dao.UsuarioDAO;
 import database.entity.Usuario;
 import crypto.AESService;
+import gui.panels.VirtualKeyboardPanel;
 
 import javax.crypto.SecretKey;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.List;
 
 public class AuthenticationService {
 
@@ -36,15 +38,20 @@ public class AuthenticationService {
         return usuario;
     }
 
-    public boolean authenticatePassword(
+    public String authenticatePassword(
             Usuario usuario,
-            String senha
+            List<String> possiblePasswords
     ) throws Exception {
+        boolean valid = false;
+        String validPassword = "";
 
-        boolean valid = PasswordManager.checkPassword(
-                senha,
-                usuario.getSenhaHash()
-        );
+        // Testar cada combinação
+        for (String password : possiblePasswords) {
+            if (PasswordManager.checkPassword(password, usuario.getSenhaHash())) {
+                valid = true;
+                validPassword = password;
+            }
+        }
 
         if (!valid) {
 
@@ -61,13 +68,13 @@ public class AuthenticationService {
 
             usuarioDAO.update(usuario);
 
-            return false;
+            return validPassword;
         }
 
         usuario.setErrosSenha(0);
         usuarioDAO.update(usuario);
 
-        return true;
+        return validPassword;
     }
 
     public boolean authenticateTOTP(

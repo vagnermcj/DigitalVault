@@ -7,8 +7,11 @@ import crypto.*;
 
 import database.dao.ChaveiroDAO;
 import database.dao.UsuarioDAO;
+import gui.setup.TOTPSetupDialog;
 
 import javax.crypto.SecretKey;
+import javax.security.auth.x500.X500Principal;
+import javax.swing.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,6 +22,8 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CadastroService {
 
@@ -32,7 +37,8 @@ public class CadastroService {
             String certPath,
             String privateKeyPath,
             String secretPhrase,
-            String senha
+            String senha,
+            boolean admin
     ) throws Exception {
 
         X509Certificate cert =
@@ -42,7 +48,7 @@ public class CadastroService {
                 CertificateService.getPublicKey(cert);
 
         String subject =
-                cert.getSubjectX500Principal().getName();
+                cert.getSubjectX500Principal().getName(X500Principal.RFC1779);
 
         String login =
                 extractEmail(subject);
@@ -118,61 +124,32 @@ public class CadastroService {
 
         usuarioDAO.updateKid(uid, kid);
 
-        System.out.println(
-                "Usuário cadastrado com sucesso"
-        );
-
-        System.out.println(
-                "UID: " + uid
-        );
-
-        System.out.println(
-                "KID: " + kid
-        );
-
-        System.out.println(
-                "TOTP Secret: " + totpSecret
-        );
+        SwingUtilities.invokeLater(() -> {
+            TOTPSetupDialog dialog = new TOTPSetupDialog( login, totpSecret, admin);
+            dialog.setVisible(true);
+        });
     }
 
     private String extractEmail(String subject) {
+        // Aceitar qualquer formato de email: EMAILADDRESS, E, ou OID
+        Pattern pattern = Pattern.compile("(?:EMAILADDRESS|E|OID\\.1\\.2\\.840\\.113549\\.1\\.9\\.1)=([^,]+)");
+        Matcher matcher = pattern.matcher(subject);
 
-        String[] parts = subject.split(",");
-
-        for (String p : parts) {
-
-            p = p.trim();
-
-            if (p.startsWith("EMAILADDRESS=")) {
-
-                return p.substring(
-                        "EMAILADDRESS=".length()
-                );
-            }
-
-            if (p.startsWith("E=")) {
-
-                return p.substring(2);
-            }
+        if (matcher.find()) {
+            return matcher.group(1).trim();
         }
 
-        return "unknown@email.com";
+        return null;
     }
 
     private String extractCommonName(String subject) {
 
-        String[] parts = subject.split(",");
+        return extractField(subject, "CN");
+    }
 
-        for (String p : parts) {
-
-            p = p.trim();
-
-            if (p.startsWith("CN=")) {
-
-                return p.substring(3);
-            }
-        }
-
-        return "Usuário";
+    private static String extractField(String dn, String field) {
+        Pattern pattern = Pattern.compile(field + "=([^,]+)");
+        Matcher matcher = pattern.matcher(dn);
+        return matcher.find() ? matcher.group(1).trim() : null;
     }
 }

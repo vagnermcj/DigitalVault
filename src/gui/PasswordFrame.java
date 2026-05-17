@@ -6,6 +6,8 @@ import service.AuthenticationService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import java.util.Objects;
 
 public class PasswordFrame extends JFrame {
 
@@ -33,35 +35,38 @@ public class PasswordFrame extends JFrame {
 
         JPanel panel = new JPanel(new BorderLayout(10,10));
 
-        txtPassword = new JTextField();
-        txtPassword.setEditable(false);
-
-        panel.add(txtPassword, BorderLayout.NORTH);
-
         VirtualKeyboardPanel keyboard =
-                new VirtualKeyboardPanel(txtPassword);
+                new VirtualKeyboardPanel();
 
         panel.add(keyboard, BorderLayout.CENTER);
 
         JButton btnNext = new JButton("Validar");
 
-        btnNext.addActionListener(e -> validatePassword());
+        btnNext.addActionListener(e -> validatePassword(keyboard));
 
         panel.add(btnNext, BorderLayout.SOUTH);
 
         add(panel);
     }
 
-    private void validatePassword() {
+    private void validatePassword(VirtualKeyboardPanel keyboard) {
 
         try {
 
-            boolean valid = authService.authenticatePassword(
+            if (!keyboard.isComplete()) {
+                JOptionPane.showMessageDialog(this,
+                        "Senha deve ter entre 8 e 10 dígitos");
+                return;
+            }
+
+            List<String> possiblePasswords = keyboard.getAllPossiblePasswords();
+
+            String valid = authService.authenticatePassword(
                     usuario,
-                    txtPassword.getText()
+                    possiblePasswords
             );
 
-            if (!valid) {
+            if (Objects.equals(valid, "")) {
 
                 JOptionPane.showMessageDialog(this,
                         "Senha inválida");
@@ -71,7 +76,7 @@ public class PasswordFrame extends JFrame {
 
             TOTPFrame frame = new TOTPFrame(
                     usuario,
-                    txtPassword.getText()
+                    valid
             );
 
             frame.setVisible(true);
