@@ -63,6 +63,15 @@ public class TOTPFrame extends JFrame {
             );
 
             if (!valid) {
+                if(usuario.getErrosTotp() >=3)
+                {
+                    JOptionPane.showMessageDialog(this,
+                            "Tentativas máximas alcançadas! Usuário bloqueado por 2 minutos");
+                    LoginFrame frame = new LoginFrame();
+                    frame.setVisible(true);
+                    dispose();
+                    return;
+                }
 
                 JOptionPane.showMessageDialog(this,
                         "Token inválido");

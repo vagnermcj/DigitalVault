@@ -64,6 +64,8 @@ public class AuthenticationService {
                                 LocalDateTime.now().plusMinutes(2)
                         )
                 );
+                usuarioDAO.update(usuario);
+                return "blocked";
             }
 
             usuarioDAO.update(usuario);
