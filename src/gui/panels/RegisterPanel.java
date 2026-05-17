@@ -3,6 +3,8 @@ package gui.panels;
 import gui.MainFrame;
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
+
 import service.CadastroService;
 
 public class RegisterPanel extends JPanel {
@@ -116,7 +118,8 @@ public class RegisterPanel extends JPanel {
                     txtCertPath.getText(),
                     txtKeyPath.getText(),
                     new String(txtPassphrase.getPassword()),
-                    senha
+                    senha,
+                    Objects.equals(String.valueOf(cmbGroup.getSelectedItem()), "Administrador")
             );
 
             JOptionPane.showMessageDialog(this,
