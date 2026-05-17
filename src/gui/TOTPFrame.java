@@ -2,6 +2,7 @@ package gui;
 
 import database.entity.Usuario;
 import gui.MainFrame;
+import session.RuntimeSession;
 import service.AuthenticationService;
 
 import javax.swing.*;
@@ -68,6 +69,8 @@ public class TOTPFrame extends JFrame {
 
                 return;
             }
+
+            RuntimeSession.setCurrentUser(usuario);
 
             MainFrame frame = new MainFrame(
                     usuario.getLogin(),
