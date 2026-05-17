@@ -6,10 +6,11 @@ import java.sql.*;
 
 public class ChaveiroDAO {
 
-    public int insert(int uid,
-                      byte[] privateKey,
-                      String pem)
-            throws Exception {
+    public int insert(
+            int uid,
+            byte[] privateKey,
+            String pem
+    ) throws Exception {
 
         try (Connection conn = DatabaseConfig.getConnection()) {
 
@@ -26,7 +27,9 @@ public class ChaveiroDAO {
             );
 
             stmt.setInt(1, uid);
+
             stmt.setBytes(2, privateKey);
+
             stmt.setString(3, pem);
 
             stmt.executeUpdate();
@@ -37,7 +40,7 @@ public class ChaveiroDAO {
                 return rs.getInt(1);
             }
 
-            return -1;
+            throw new Exception("Falha ao gerar KID");
         }
     }
 }

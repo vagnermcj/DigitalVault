@@ -31,7 +31,7 @@ public class DatabaseInitializer {
                     gid INTEGER NOT NULL,
                     senha_hash CHAR(60) NOT NULL,
                     totp_secret_encrypted TEXT NOT NULL,
-                    kid INTEGER NOT NULL,
+                    kid INTEGER,
                     bloqueado_ate TIMESTAMP,
                     erros_senha INTEGER DEFAULT 0,
                     erros_totp INTEGER DEFAULT 0,
