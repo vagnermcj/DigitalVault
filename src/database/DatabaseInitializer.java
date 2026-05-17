@@ -5,8 +5,8 @@ import config.DatabaseConfig;
 import java.sql.Connection;
 import java.sql.Statement;
 
-import java.sql.Connection;
-import java.sql.Statement;
+import database.dao.GrupoDAO;
+import database.dao.MensagemDAO;
 
 public class DatabaseInitializer {
 
@@ -64,6 +64,10 @@ public class DatabaseInitializer {
                     arquivo_nome VARCHAR(255)
                 )
             """);
+
+            new GrupoDAO().initializeGroups();
+
+            new MensagemDAO().initializeMessages();
         }
     }
 }
