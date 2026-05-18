@@ -150,33 +150,36 @@ public class ConsultPanel extends JPanel {
             String passphrase = new String(txtPassphrase.getPassword());
 
             ChaveiroDAO chaveiroDAO = new ChaveiroDAO();
-            Chaveiro chaveiro = chaveiroDAO.findByUid(current.getUid());
+            Chaveiro chaveiro =
+                    chaveiroDAO.findByUid(1);
 
             if (chaveiro == null) {
                 JOptionPane.showMessageDialog(this, "Chave do usuário não encontrada.");
                 return;
             }
 
-            PrivateKey userPrivateKey = decryptPrivateKey(
-                    chaveiro.getPrivateKeyEncrypted(),
-                    passphrase
-            );
+            PrivateKey adminPrivateKey =
+                    RSAService.loadPrivateKey(
+                            chaveiro.getPrivateKeyEncrypted(),
+                            passphrase
+                    );
 
-            PublicKey userPublicKey = extractPublicKey(chaveiro.getCertificadoPem());
+            PublicKey adminPublicKey =
+                    extractPublicKey(
+                            chaveiro.getCertificadoPem()
+                    );
 
-            boolean valid = SignatureService.validatePrivateKey(userPrivateKey, userPublicKey);
+            boolean valid =
+                    SignatureService.validatePrivateKey(
+                            adminPrivateKey,
+                            adminPublicKey
+                    );
+
             if (!valid) {
                 LogService.registrar(6006, current.getUid(), null);
                 JOptionPane.showMessageDialog(this, "Frase secreta inválida.");
                 return;
             }
-
-            Chaveiro chaveiroAdmin = chaveiroDAO.findByUid(1);
-            adminPublicKey  = extractPublicKey(chaveiroAdmin.getCertificadoPem());
-            adminPrivateKey = RSAService.loadPrivateKey(
-                    chaveiroAdmin.getPrivateKeyEncrypted(),
-                    RuntimeSession.getAdminSecretPhrase()
-            );
 
             currentFiles = service.loadIndex(folder, adminPrivateKey, adminPublicKey);
 
@@ -240,16 +243,6 @@ public class ConsultPanel extends JPanel {
             } catch (Exception ignored) {LogService.registrar(7016, current.getUid(), record.getNome());}
             JOptionPane.showMessageDialog(this, "Erro: " + e.getMessage());
         }
-    }
-
-    private PrivateKey decryptPrivateKey(byte[] encryptedKey, String passphrase)
-            throws Exception {
-
-        javax.crypto.SecretKey aesKey = AESService.generateKey(passphrase);
-        byte[] decrypted = AESService.decrypt(encryptedKey, aesKey);
-
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decrypted);
-        return KeyFactory.getInstance("RSA").generatePrivate(spec);
     }
 
     private PublicKey extractPublicKey(String pem) throws Exception {
