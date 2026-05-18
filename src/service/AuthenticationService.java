@@ -41,46 +41,115 @@ public class AuthenticationService {
         return usuario;
     }
 
-    public String authenticatePassword(
-            Usuario usuario,
-            List<String> possiblePasswords
-    ) throws Exception {
-        boolean valid = false;
-        String validPassword = "";
+    private String findMatchingPassword(
+            String bcryptHash,
+            List<int[]> pairs,
+            int index,
+            StringBuilder current
+    ) {
 
-        // Testar cada combinação
-        for (String password : possiblePasswords) {
-            if (PasswordManager.checkPassword(password, usuario.getSenhaHash())) {
-                valid = true;
-                validPassword = password;
+        if (index == pairs.size()) {
+
+            String password =
+                    current.toString();
+
+            if (PasswordManager.checkPassword(
+                    password,
+                    bcryptHash
+            )) {
+
+                return password;
             }
+
+            return null;
         }
 
-        if (!valid) {
+        int[] pair = pairs.get(index);
 
-            usuario.setErrosSenha(usuario.getErrosSenha() + 1);
-            LogService.registrar(3003 + usuario.getErrosSenha(), usuario.getUid(), null);
+        current.append(pair[0]);
 
-            if (usuario.getErrosSenha() >= 3) {
-
-                usuario.setBloqueadoAte(
-                        Timestamp.valueOf(
-                                LocalDateTime.now().plusMinutes(2)
-                        )
+        String left =
+                findMatchingPassword(
+                        bcryptHash,
+                        pairs,
+                        index + 1,
+                        current
                 );
-                usuarioDAO.update(usuario);
-                return "blocked";
-            }
+
+        if (left != null) {
+            return left;
+        }
+
+        current.deleteCharAt(
+                current.length() - 1
+        );
+
+        current.append(pair[1]);
+
+        String right =
+                findMatchingPassword(
+                        bcryptHash,
+                        pairs,
+                        index + 1,
+                        current
+                );
+
+        if (right != null) {
+            return right;
+        }
+
+        current.deleteCharAt(
+                current.length() - 1
+        );
+
+        return null;
+    }
+
+    public String authenticatePassword(
+            Usuario usuario,
+            List<int[]> clickedPairs
+    ) throws Exception {
+
+        String result =
+                findMatchingPassword(
+                        usuario.getSenhaHash(),
+                        clickedPairs,
+                        0,
+                        new StringBuilder()
+                );
+
+        if (result != null) {
+
+            usuario.setErrosSenha(0);
 
             usuarioDAO.update(usuario);
 
-            return validPassword;
+            return result;
         }
 
-        usuario.setErrosSenha(0);
+        // ERRO
+
+        usuario.setErrosSenha(
+                usuario.getErrosSenha() + 1
+        );
+
+        if (usuario.getErrosSenha() >= 3) {
+
+            usuario.setBloqueadoAte(
+                    Timestamp.valueOf(
+                            LocalDateTime.now()
+                                    .plusMinutes(2)
+                    )
+            );
+
+            usuarioDAO.update(usuario);
+
+            return "blocked";
+        }
+
         usuarioDAO.update(usuario);
 
-        return validPassword;
+        return "";
     }
 
     public boolean authenticateTOTP(

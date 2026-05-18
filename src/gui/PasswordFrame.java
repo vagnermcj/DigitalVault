@@ -63,12 +63,11 @@ public class PasswordFrame extends JFrame {
                 return;
             }
 
-            List<String> possiblePasswords = keyboard.getAllPossiblePasswords();
-
-            String valid = authService.authenticatePassword(
-                    usuario,
-                    possiblePasswords
-            );
+            String valid =
+                    authService.authenticatePassword(
+                            usuario,
+                            keyboard.getClickedPairs()
+                    );
 
             if (Objects.equals(valid, "")) {
                 JOptionPane.showMessageDialog(this,

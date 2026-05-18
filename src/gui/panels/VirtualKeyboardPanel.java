@@ -100,26 +100,8 @@ public class VirtualKeyboardPanel extends JPanel {
         generateRandomLayout();
     }
 
-    public List<String> getAllPossiblePasswords() {
-        if (clickedPairs.size() < 8) {
-            return Collections.emptyList();
-        }
-
-        List<String> combinations = new ArrayList<>();
-        generateCombinations(clickedPairs, 0, "", combinations);
-        return combinations;
-    }
-
-    private void generateCombinations(List<int[]> pairs, int index,
-                                      String current, List<String> results) {
-        if (index == pairs.size()) {
-            results.add(current);
-            return;
-        }
-
-        int[] pair = pairs.get(index);
-        generateCombinations(pairs, index + 1, current + pair[0], results);
-        generateCombinations(pairs, index + 1, current + pair[1], results);
+    public List<int[]> getClickedPairs() {
+        return clickedPairs;
     }
 
     public boolean isComplete() {
