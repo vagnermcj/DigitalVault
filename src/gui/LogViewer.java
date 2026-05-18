@@ -1,4 +1,5 @@
 package gui;
+
 import config.DatabaseConfig;
 
 import crypto.CertificateService;
@@ -9,7 +10,6 @@ import java.io.Console;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
-
 import java.security.SecureRandom;
 
 import java.security.cert.X509Certificate;
@@ -129,7 +129,7 @@ public class LogViewer {
                                     r.data_hora,
                                     r.mid,
                                     m.mensagem,
-                                    u.login,
+                                    u.login AS login_name,
                                     r.arquivo_nome
                                 FROM Registros r
                                 JOIN Mensagens m
@@ -162,38 +162,40 @@ public class LogViewer {
                                     "mensagem"
                             );
 
-                    String usuario =
+                    String loginName =
                             rs.getString(
-                                    "login"
+                                    "login_name"
                             );
 
-                    String arquivo =
+                    String arquivoNome =
                             rs.getString(
                                     "arquivo_nome"
                             );
 
-                    StringBuilder sb =
-                            new StringBuilder();
+                    if (loginName != null) {
 
-                    sb.append(dataHora)
-                            .append(" | MID=")
-                            .append(mid)
-                            .append(" | ")
-                            .append(mensagem);
-
-                    if (usuario != null) {
-
-                        sb.append(" | USER=")
-                                .append(usuario);
+                        mensagem =
+                                mensagem.replace(
+                                        "<login_name>",
+                                        loginName
+                                );
                     }
 
-                    if (arquivo != null) {
+                    if (arquivoNome != null) {
 
-                        sb.append(" | FILE=")
-                                .append(arquivo);
+                        mensagem =
+                                mensagem.replace(
+                                        "<arq_name>",
+                                        arquivoNome
+                                );
                     }
 
-                    System.out.println(sb);
+                    System.out.printf(
+                            "%s | %04d | %s%n",
+                            dataHora,
+                            mid,
+                            mensagem
+                    );
                 }
             }
 

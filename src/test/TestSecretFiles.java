@@ -16,7 +16,7 @@ public class TestSecretFiles {
 
         X509Certificate cert =
                 CertificateService.loadCertificate(
-                        "admin.pem"
+                        "D:/TrabalhoSeguranca/Assets/admin_cert.pem"
                 );
 
         PublicKey publicKey =
@@ -24,8 +24,8 @@ public class TestSecretFiles {
 
         PrivateKey privateKey =
                 RSAService.loadPrivateKey(
-                        "admin.bin",
-                        "admin123"
+                        "D:/TrabalhoSeguranca/Assets/admin_key.bin",
+                        "AdminSecret2026!"
                 );
 
         FileSecurityService service =
@@ -34,8 +34,8 @@ public class TestSecretFiles {
         // ARQUIVO REAL
 
         service.encryptFile(
-                "D:/vault/segredo.txt",
-                "D:/vault/A1",
+                "D:/TrabalhoSeguranca/arqs/segredo.txt",
+                "D:/TrabalhoSeguranca/arqs/A1",
                 privateKey,
                 publicKey
         );
@@ -43,8 +43,8 @@ public class TestSecretFiles {
         // ÍNDICE
 
         service.encryptFile(
-                "D:/vault/index.txt",
-                "D:/vault/index",
+                "D:/TrabalhoSeguranca/arqs/index.txt",
+                "D:/TrabalhoSeguranca/arqs/index",
                 privateKey,
                 publicKey
         );
