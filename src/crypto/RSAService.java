@@ -30,6 +30,17 @@ public class RSAService {
         return factory.generatePrivate(spec);
     }
 
+    // Adicione em RSAService.java
+    public static PrivateKey loadPrivateKey(byte[] encryptedBytes, String secretPhrase)
+            throws Exception {
+
+        SecretKey key = AESService.generateKey(secretPhrase);
+        byte[] decrypted = AESService.decrypt(encryptedBytes, key);
+
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decrypted);
+        return KeyFactory.getInstance("RSA").generatePrivate(spec);
+    }
+
     public static byte[] encrypt(byte[] data,
                                  PublicKey publicKey)
             throws Exception {

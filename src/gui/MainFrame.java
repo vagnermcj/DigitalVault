@@ -23,6 +23,7 @@ public class MainFrame extends JFrame {
     private String userGroup;
     private String userName;
     private int totalAccesses;
+    private int totalUsers;
 
     public MainFrame(String login, String group, String name, int accesses) {
         this.userLogin = login;
@@ -111,7 +112,7 @@ public class MainFrame extends JFrame {
     }
 
     public void showRegisterPanel() {
-        updateBody1Info("Total de usuários do sistema: 5"); // Mock data
+        updateBody1Info("Total de usuários do sistema: "); // Mock data
         RegisterPanel panel = new RegisterPanel(this);
         switchBody2Panel(panel);
     }
