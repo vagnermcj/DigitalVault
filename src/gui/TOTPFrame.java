@@ -2,11 +2,15 @@ package gui;
 
 import database.entity.Usuario;
 import gui.MainFrame;
+import service.LogService;
 import session.RuntimeSession;
 import service.AuthenticationService;
 
 import javax.swing.*;
 import java.awt.*;
+
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
 
 public class TOTPFrame extends JFrame {
 
@@ -53,7 +57,7 @@ public class TOTPFrame extends JFrame {
     }
 
     private void validateTOTP() {
-
+        LogService.registrar(4001, usuario.getUid(), null);
         try {
 
             boolean valid = authService.authenticateTOTP(
@@ -67,6 +71,9 @@ public class TOTPFrame extends JFrame {
                 {
                     JOptionPane.showMessageDialog(this,
                             "Tentativas máximas alcançadas! Usuário bloqueado por 2 minutos");
+                    LogService.registrar(4006, usuario.getUid(), null);
+                    LogService.registrar(4007, usuario.getUid(), null);
+                    LogService.registrar(2002, null, null);
                     LoginFrame frame = new LoginFrame();
                     frame.setVisible(true);
                     dispose();
@@ -80,6 +87,12 @@ public class TOTPFrame extends JFrame {
             }
 
             RuntimeSession.setCurrentUser(usuario);
+
+
+            LogService.registrar(4003, usuario.getUid(), null);
+            LogService.registrar(4002, usuario.getUid(), null);
+            LogService.registrar(1003, usuario.getUid(), null);
+            LogService.registrar(5001, usuario.getUid(), null);
 
             MainFrame frame = new MainFrame(
                     usuario.getLogin(),

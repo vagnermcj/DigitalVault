@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class AuthenticationService {
 
     private UsuarioDAO usuarioDAO = new UsuarioDAO();
@@ -56,6 +59,7 @@ public class AuthenticationService {
         if (!valid) {
 
             usuario.setErrosSenha(usuario.getErrosSenha() + 1);
+            LogService.registrar(3003 + usuario.getErrosSenha(), usuario.getUid(), null);
 
             if (usuario.getErrosSenha() >= 3) {
 
@@ -102,6 +106,7 @@ public class AuthenticationService {
         if (!valid) {
 
             usuario.setErrosTotp(usuario.getErrosTotp() + 1);
+            LogService.registrar(4003 + usuario.getErrosTotp(), usuario.getUid(), null);
 
             if (usuario.getErrosTotp() >= 3) {
 

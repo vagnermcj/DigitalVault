@@ -4,6 +4,9 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class TOTP {
     private byte[] key = null;
     private long timeStepInSeconds = 30;

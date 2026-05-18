@@ -5,6 +5,9 @@ import database.entity.Usuario;
 
 import java.sql.*;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class UsuarioDAO {
 
     public int insertReturningId(

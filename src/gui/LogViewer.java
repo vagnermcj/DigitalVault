@@ -18,6 +18,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class LogViewer {
 
     public static void main(String[] args) {

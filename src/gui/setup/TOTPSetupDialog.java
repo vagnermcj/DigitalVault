@@ -7,6 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class TOTPSetupDialog extends JDialog {
 
     public TOTPSetupDialog(String email, String totpSecret, boolean Admin) {

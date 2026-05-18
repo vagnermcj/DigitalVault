@@ -4,9 +4,13 @@ import database.dao.UsuarioDAO;
 import database.DatabaseInitializer;
 import gui.LoginFrame;
 import gui.setup.AdminSetupFrame;
+import service.LogService;
 import service.SystemStartupService;
 
 import javax.swing.*;
+
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968 
 
 public class Main {
 
@@ -15,6 +19,7 @@ public class Main {
         try {
 
             DatabaseInitializer.initialize();
+            LogService.registrar(1001, null, null);
 
             UsuarioDAO usuarioDAO =
                     new UsuarioDAO();
@@ -27,6 +32,7 @@ public class Main {
                 try {
 
                     if (!hasUsers) {
+                        LogService.registrar(1005, null, null);
 
                         AdminSetupFrame frame =
                                 new AdminSetupFrame();
@@ -35,6 +41,8 @@ public class Main {
 
                         return;
                     }
+
+                    LogService.registrar(1006, null, null);
 
                     boolean valid =
                             SystemStartupService

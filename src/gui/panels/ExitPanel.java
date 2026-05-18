@@ -7,6 +7,9 @@ import service.LogService;
 import javax.swing.*;
 import java.awt.*;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class ExitPanel extends JPanel {
 
     private MainFrame mainFrame;
@@ -17,6 +20,7 @@ public class ExitPanel extends JPanel {
     }
 
     private void initComponents() {
+        LogService.registrar(8001, RuntimeSession.getCurrentUser().getUid(), null);
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
 
@@ -45,7 +49,10 @@ public class ExitPanel extends JPanel {
         btnEndSystem.addActionListener(e -> handleEndSystem());
 
         JButton btnBack = new JButton("Voltar");
-        btnBack.addActionListener(e -> mainFrame.showMainMenu());
+        btnBack.addActionListener(e -> {
+            LogService.registrar(8004, RuntimeSession.getCurrentUser().getUid(), null);
+            mainFrame.showMainMenu();
+        });
 
         buttonsPanel.add(btnEndSession);
         buttonsPanel.add(btnEndSystem);
@@ -110,6 +117,8 @@ public class ExitPanel extends JPanel {
         );
 
         if (confirm == JOptionPane.YES_OPTION) {
+            LogService.registrar(8003, RuntimeSession.getCurrentUser().getUid(), null);
+            LogService.registrar(1002, null, null);
             RuntimeSession.clearAll();
             System.exit(0);
         }

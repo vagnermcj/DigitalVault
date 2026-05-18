@@ -3,12 +3,16 @@ package gui;
 import database.entity.Usuario;
 import gui.MainFrame;
 import service.AuthenticationService;
+import service.LogService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
 
 public class LoginFrame extends JFrame {
 
@@ -54,7 +58,7 @@ public class LoginFrame extends JFrame {
     }
 
     private void authenticate() {
-
+        LogService.registrar(2001, null, null);
         try {
 
             Usuario usuario = authService.authenticateLogin(
@@ -62,6 +66,7 @@ public class LoginFrame extends JFrame {
             );
 
             if (usuario == null) {
+                LogService.registrar(2005, null, null);
                 JOptionPane.showMessageDialog(this,
                         "Usuário não encontrado");
 
@@ -72,12 +77,15 @@ public class LoginFrame extends JFrame {
 
                 JOptionPane.showMessageDialog(this,
                         "Usuário está bloqueado!");
+
+                LogService.registrar(2004, null, null);
                 return;
             }
 
             usuario.setBloqueadoAte(null);
             usuario.setErrosSenha(0);
             usuario.setErrosTotp(0);
+            LogService.registrar(2003, null, null);
 
             PasswordFrame frame =
                     new PasswordFrame(usuario);

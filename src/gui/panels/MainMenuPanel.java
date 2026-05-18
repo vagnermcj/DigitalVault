@@ -1,8 +1,14 @@
 package gui.panels;
 
 import gui.MainFrame;
+import service.LogService;
+import session.RuntimeSession;
+
 import javax.swing.*;
 import java.awt.*;
+
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
 
 public class MainMenuPanel extends JPanel {
 
@@ -32,18 +38,27 @@ public class MainMenuPanel extends JPanel {
         // Buttons
         if (userGroup.equals("Administrador")) {
             JButton btnRegister = createMenuButton("1 - Cadastrar um novo usuário");
-            btnRegister.addActionListener(e -> mainFrame.showRegisterPanel());
+            btnRegister.addActionListener(e -> {
+                mainFrame.showRegisterPanel();
+                LogService.registrar(5002, RuntimeSession.getCurrentUser().getUid(), null);
+            });
             menuPanel.add(btnRegister);
             menuPanel.add(Box.createVerticalStrut(10));
         }
 
         JButton btnConsult = createMenuButton("2 - Consultar pasta de arquivos secretos do usuário");
-        btnConsult.addActionListener(e -> mainFrame.showConsultPanel());
+        btnConsult.addActionListener(e -> {
+            mainFrame.showConsultPanel();
+            LogService.registrar(5003, RuntimeSession.getCurrentUser().getUid(), null);
+        });
         menuPanel.add(btnConsult);
         menuPanel.add(Box.createVerticalStrut(10));
 
         JButton btnExit = createMenuButton("3 - Sair do Sistema");
-        btnExit.addActionListener(e -> mainFrame.showExitPanel());
+        btnExit.addActionListener(e -> {
+            mainFrame.showExitPanel();
+            LogService.registrar(5004, RuntimeSession.getCurrentUser().getUid(), null);
+        });
         menuPanel.add(btnExit);
 
         add(menuPanel, BorderLayout.CENTER);

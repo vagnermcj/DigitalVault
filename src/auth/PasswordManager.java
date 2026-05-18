@@ -3,6 +3,9 @@ package auth;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import java.security.SecureRandom;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class PasswordManager {
     private static final int BCRYPT_COST = 8;
 

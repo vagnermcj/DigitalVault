@@ -39,6 +39,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 
 import java.util.List;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class ConsultPanel extends JPanel {
 
     private MainFrame mainFrame;
@@ -163,6 +166,7 @@ public class ConsultPanel extends JPanel {
 
             boolean valid = SignatureService.validatePrivateKey(userPrivateKey, userPublicKey);
             if (!valid) {
+                LogService.registrar(6006, current.getUid(), null);
                 JOptionPane.showMessageDialog(this, "Frase secreta inválida.");
                 return;
             }
@@ -233,7 +237,7 @@ public class ConsultPanel extends JPanel {
             e.printStackTrace();
             try {
                 LogService.registrar(7015, current.getUid(), record.getNome());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {LogService.registrar(7016, current.getUid(), record.getNome());}
             JOptionPane.showMessageDialog(this, "Erro: " + e.getMessage());
         }
     }

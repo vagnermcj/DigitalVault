@@ -4,6 +4,9 @@ import gui.panels.*;
 import javax.swing.*;
 import java.awt.*;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class MainFrame extends JFrame {
 
     private JLabel lblLogin;
@@ -104,7 +107,7 @@ public class MainFrame extends JFrame {
     }
 
     public void showRegisterPanel() {
-        updateBody1Info("Total de usuários do sistema: "); // Mock data
+        updateBody1Info("Total de usuários do sistema: ");
         RegisterPanel panel = new RegisterPanel(this);
         switchBody2Panel(panel);
     }

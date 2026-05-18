@@ -6,6 +6,11 @@ import java.awt.*;
 import java.util.Objects;
 
 import service.CadastroService;
+import service.LogService;
+import session.RuntimeSession;
+
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
 
 public class RegisterPanel extends JPanel {
 
@@ -24,6 +29,7 @@ public class RegisterPanel extends JPanel {
     }
 
     private void initComponents() {
+        LogService.registrar(6001, RuntimeSession.getCurrentUser().getUid(), null);
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
@@ -74,7 +80,10 @@ public class RegisterPanel extends JPanel {
         btnRegister.addActionListener(e -> handleRegister());
 
         JButton btnBack = new JButton("Voltar");
-        btnBack.addActionListener(e -> mainFrame.showMainMenu());
+        btnBack.addActionListener(e -> {
+            mainFrame.showMainMenu();
+            LogService.registrar(6010, RuntimeSession.getCurrentUser().getUid(), null);
+        });
 
         buttonsPanel.add(btnRegister);
         buttonsPanel.add(btnBack);
@@ -95,7 +104,7 @@ public class RegisterPanel extends JPanel {
     }
 
     private void handleRegister() {
-
+        LogService.registrar(6002, RuntimeSession.getCurrentUser().getUid(), null);
         try {
 
             String senha =

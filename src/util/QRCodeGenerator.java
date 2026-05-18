@@ -12,6 +12,9 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class QRCodeGenerator {
 
     public static BufferedImage generateQRCode(String text, int width, int height)

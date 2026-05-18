@@ -7,6 +7,9 @@ import session.RuntimeSession;
 import javax.swing.*;
 import java.awt.*;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class AdminSetupFrame extends JFrame {
 
     private JTextField txtCert;

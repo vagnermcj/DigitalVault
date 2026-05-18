@@ -3,11 +3,15 @@ package gui;
 import database.entity.Usuario;
 import gui.panels.VirtualKeyboardPanel;
 import service.AuthenticationService;
+import service.LogService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.Objects;
+
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
 
 public class PasswordFrame extends JFrame {
 
@@ -52,7 +56,7 @@ public class PasswordFrame extends JFrame {
     private void validatePassword(VirtualKeyboardPanel keyboard) {
 
         try {
-
+            LogService.registrar(3001, usuario.getUid(), null);
             if (!keyboard.isComplete()) {
                 JOptionPane.showMessageDialog(this,
                         "Senha deve ter entre 8 e 10 dígitos");
@@ -67,7 +71,6 @@ public class PasswordFrame extends JFrame {
             );
 
             if (Objects.equals(valid, "")) {
-
                 JOptionPane.showMessageDialog(this,
                         "Senha inválida");
 
@@ -77,11 +80,17 @@ public class PasswordFrame extends JFrame {
             {
                 JOptionPane.showMessageDialog(this,
                         "Tentativas máximas alcançadas! Usuário bloqueado por 2 minutos");
+                LogService.registrar(3006, usuario.getUid(), null);
+                LogService.registrar(3007, usuario.getUid(), null);
+                LogService.registrar(2002, null, null);
                 LoginFrame frame = new LoginFrame();
                 frame.setVisible(true);
                 dispose();
                 return;
             }
+
+            LogService.registrar(3003, usuario.getUid(), null);
+            LogService.registrar(3002, usuario.getUid(), null);
 
             TOTPFrame frame = new TOTPFrame(
                     usuario,

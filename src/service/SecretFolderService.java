@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class SecretFolderService {
 
     public List<SecretFileRecord> loadIndex(

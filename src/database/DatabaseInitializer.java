@@ -8,6 +8,9 @@ import java.sql.Statement;
 import database.dao.GrupoDAO;
 import database.dao.MensagemDAO;
 
+// Vagner Messias da Costa Junior - 2112851
+// Túlio Martins de Lima - 2212968
+
 public class DatabaseInitializer {
 
     public static void initialize() throws Exception {
