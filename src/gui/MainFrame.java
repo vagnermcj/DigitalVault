@@ -6,19 +6,15 @@ import java.awt.*;
 
 public class MainFrame extends JFrame {
 
-    // Header components
     private JLabel lblLogin;
     private JLabel lblGroup;
     private JLabel lblName;
 
-    // Body 1 components
     private JLabel lblInfo;
 
-    // Body 2 (dynamic panel)
     private JPanel body2Container;
     private JPanel currentBody2Panel;
 
-    // User data
     private String userLogin;
     private String userGroup;
     private String userName;
@@ -44,7 +40,6 @@ public class MainFrame extends JFrame {
 
         add(createHeader(), BorderLayout.NORTH);
 
-        // Body 1 and Body 2 in center
         JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
         centerPanel.add(createBody1(), BorderLayout.NORTH);
 
@@ -90,12 +85,10 @@ public class MainFrame extends JFrame {
         return panel;
     }
 
-    // Method to update Body 1 info
     public void updateBody1Info(String info) {
         lblInfo.setText(info);
     }
 
-    // Method to switch Body 2 panels
     public void switchBody2Panel(JPanel newPanel) {
         body2Container.removeAll();
         body2Container.add(newPanel, BorderLayout.CENTER);
@@ -104,7 +97,6 @@ public class MainFrame extends JFrame {
         body2Container.repaint();
     }
 
-    // Navigation methods
     public void showMainMenu() {
         updateBody1Info("Total de acessos do usuário: " + totalAccesses);
         MainMenuPanel panel = new MainMenuPanel(this, userGroup);
@@ -129,7 +121,6 @@ public class MainFrame extends JFrame {
         switchBody2Panel(panel);
     }
 
-    // Getters
     public String getUserLogin() { return userLogin; }
     public String getUserGroup() { return userGroup; }
     public String getUserName() { return userName; }

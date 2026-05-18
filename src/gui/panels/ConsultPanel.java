@@ -49,7 +49,6 @@ public class ConsultPanel extends JPanel {
     private SecretFolderService service = new SecretFolderService();
     private List<SecretFileRecord> currentFiles;
 
-    // Chaves do admin, carregadas após validação bem-sucedida da frase secreta
     private PrivateKey adminPrivateKey;
     private PublicKey  adminPublicKey;
 
@@ -63,7 +62,6 @@ public class ConsultPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        // ── Painel de entrada (idêntico ao layout do enunciado) ──────────────
         JPanel inputPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill   = GridBagConstraints.HORIZONTAL;
@@ -88,7 +86,6 @@ public class ConsultPanel extends JPanel {
 
         add(inputPanel, BorderLayout.NORTH);
 
-        // ── Tabela não editável ──────────────────────────────────────────────
         String[] columns = {"Nome Código", "Nome Secreto", "Dono", "Grupo"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
@@ -112,7 +109,6 @@ public class ConsultPanel extends JPanel {
 
         add(new JScrollPane(fileTable), BorderLayout.CENTER);
 
-        // ── Botão Voltar ─────────────────────────────────────────────────────
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton btnBack = new JButton("Voltar");
         btnBack.addActionListener(e -> {
@@ -178,7 +174,6 @@ public class ConsultPanel extends JPanel {
                     RuntimeSession.getAdminSecretPhrase()
             );
 
-            // 4. Decripta o índice e filtra os arquivos visíveis ao usuário
             currentFiles = service.loadIndex(folder, adminPrivateKey, adminPublicKey);
 
             LogService.registrar(7005, current.getUid(), null);
