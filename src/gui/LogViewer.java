@@ -1,44 +1,236 @@
 package gui;
-
 import config.DatabaseConfig;
 
+import crypto.CertificateService;
+import crypto.RSAService;
+import crypto.SignatureService;
+
+import java.io.Console;
+
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
+import java.security.SecureRandom;
+
+import java.security.cert.X509Certificate;
+
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 
 public class LogViewer {
 
     public static void main(String[] args) {
 
-        try (Connection conn = DatabaseConfig.getConnection()) {
+        try {
 
-            Statement stmt = conn.createStatement();
-
-            ResultSet rs = stmt.executeQuery(
-                    """
-                    SELECT r.data_hora,
-                           r.mid,
-                           m.mensagem
-                    FROM Registros r
-                    JOIN Mensagens m
-                        ON r.mid = m.mid
-                    ORDER BY r.data_hora
-                    """
-            );
-
-            while (rs.next()) {
+            if (args.length < 2) {
 
                 System.out.println(
-                        rs.getString("data_hora") +
-                                " - " +
-                                rs.getInt("mid") +
-                                " - " +
-                                rs.getString("mensagem")
+                        "Uso:"
                 );
+
+                System.out.println(
+                        "java audit.LogViewer <cert.pem> <private.bin>"
+                );
+
+                return;
+            }
+
+            String certPath = args[0];
+
+            String keyPath = args[1];
+
+            Console console = System.console();
+
+            if (console == null) {
+
+                System.out.println(
+                        "Console indisponível."
+                );
+
+                return;
+            }
+
+            char[] phraseChars =
+                    console.readPassword(
+                            "Frase secreta: "
+                    );
+
+            String phrase =
+                    new String(phraseChars);
+
+            X509Certificate cert =
+                    CertificateService.loadCertificate(
+                            certPath
+                    );
+
+            PublicKey publicKey =
+                    CertificateService.getPublicKey(
+                            cert
+                    );
+
+            PrivateKey privateKey =
+                    RSAService.loadPrivateKey(
+                            keyPath,
+                            phrase
+                    );
+
+            byte[] random =
+                    new byte[2048];
+
+            new SecureRandom()
+                    .nextBytes(random);
+
+            byte[] signature =
+                    SignatureService.sign(
+                            random,
+                            privateKey
+                    );
+
+            boolean valid =
+                    SignatureService.verify(
+                            random,
+                            signature,
+                            publicKey
+                    );
+
+            if (!valid) {
+
+                System.out.println(
+                        "Falha validação da chave privada."
+                );
+
+                return;
+            }
+
+            String login =
+                    extractEmail(
+                            cert.getSubjectX500Principal()
+                                    .getName()
+                    );
+
+            if (login == null) {
+
+                System.out.println(
+                        "Administrador inválido."
+                );
+
+                return;
+            }
+
+            try (Connection conn =
+                         DatabaseConfig.getConnection()) {
+
+                PreparedStatement stmt =
+                        conn.prepareStatement(
+                                """
+                                SELECT
+                                    r.data_hora,
+                                    r.mid,
+                                    m.mensagem,
+                                    u.login,
+                                    r.arquivo_nome
+                                FROM Registros r
+                                JOIN Mensagens m
+                                    ON r.mid = m.mid
+                                LEFT JOIN Usuarios u
+                                    ON r.uid = u.uid
+                                ORDER BY r.data_hora
+                                """
+                        );
+
+                ResultSet rs =
+                        stmt.executeQuery();
+
+                System.out.println(
+                        "\n===== LOG VIEWER =====\n"
+                );
+
+                while (rs.next()) {
+
+                    String dataHora =
+                            rs.getString(
+                                    "data_hora"
+                            );
+
+                    int mid =
+                            rs.getInt("mid");
+
+                    String mensagem =
+                            rs.getString(
+                                    "mensagem"
+                            );
+
+                    String usuario =
+                            rs.getString(
+                                    "login"
+                            );
+
+                    String arquivo =
+                            rs.getString(
+                                    "arquivo_nome"
+                            );
+
+                    StringBuilder sb =
+                            new StringBuilder();
+
+                    sb.append(dataHora)
+                            .append(" | MID=")
+                            .append(mid)
+                            .append(" | ")
+                            .append(mensagem);
+
+                    if (usuario != null) {
+
+                        sb.append(" | USER=")
+                                .append(usuario);
+                    }
+
+                    if (arquivo != null) {
+
+                        sb.append(" | FILE=")
+                                .append(arquivo);
+                    }
+
+                    System.out.println(sb);
+                }
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+
+            System.out.println(
+                    "Erro: " + e.getMessage()
+            );
+
+            System.exit(1);
         }
+    }
+
+    private static String extractEmail(
+            String subject
+    ) {
+
+        String[] parts =
+                subject.split(",");
+
+        for (String p : parts) {
+
+            p = p.trim();
+
+            if (p.startsWith("EMAILADDRESS=")) {
+
+                return p.substring(
+                        "EMAILADDRESS=".length()
+                );
+            }
+
+            if (p.startsWith("E=")) {
+
+                return p.substring(2);
+            }
+        }
+
+        return null;
     }
 }
