@@ -1,9 +1,15 @@
 package gui.panels;
 
+import crypto.CertificateService;
 import gui.MainFrame;
+
+import javax.security.auth.x500.X500Principal;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
+import java.security.cert.X509Certificate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import service.CadastroService;
 import service.LogService;
@@ -33,12 +39,10 @@ public class RegisterPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        // Title
         JLabel title = new JLabel("Formulário de Cadastro", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 16));
         add(title, BorderLayout.NORTH);
 
-        // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -46,34 +50,27 @@ public class RegisterPanel extends JPanel {
 
         int row = 0;
 
-        // Certificate path
         addFormField(formPanel, gbc, row++, "Caminho do arquivo do certificado digital:",
                 txtCertPath = new JTextField(30));
 
-        // Private key path
         addFormField(formPanel, gbc, row++, "Caminho do arquivo da chave privada:",
                 txtKeyPath = new JTextField(30));
 
-        // Passphrase
         addFormField(formPanel, gbc, row++, "Frase secreta:",
                 txtPassphrase = new JPasswordField(30));
 
-        // Group
         String[] groups = {"Administrador", "Usuário"};
         cmbGroup = new JComboBox<>(groups);
         addFormField(formPanel, gbc, row++, "Grupo:", cmbGroup);
 
-        // Password
         addFormField(formPanel, gbc, row++, "Senha pessoal:",
                 txtPassword = new JPasswordField(30));
 
-        // Password confirmation
         addFormField(formPanel, gbc, row++, "Confirmação senha pessoal:",
                 txtPasswordConfirm = new JPasswordField(30));
 
         add(formPanel, BorderLayout.CENTER);
 
-        // Buttons panel
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
         JButton btnRegister = new JButton("Cadastrar");
@@ -120,6 +117,47 @@ public class RegisterPanel extends JPanel {
 
                 return;
             }
+            else if(hasConsecutiveRepeats(senha, 3))
+            {
+                JOptionPane.showMessageDialog(this,
+                        "Senha com sequência de numeros repetidos");
+
+                return;
+            }
+            else if(!senha.matches("\\d+"))
+            {
+                JOptionPane.showMessageDialog(this,
+                        "Senha deve possuir apenas digitos");
+
+                return;
+            }
+            else if(senha.isEmpty())
+            {
+                JOptionPane.showMessageDialog(this,
+                        "Senha deve possuir apenas digitos");
+
+                return;
+            }
+            else if(senha.length() < 8 || senha.length() > 10)
+            {
+                JOptionPane.showMessageDialog(this,
+                        "Senha deve ser entre 8 e 10 digitos");
+
+                return;
+            }
+
+            X509Certificate cert =
+                    CertificateService.loadCertificate(
+                            txtCertPath.getText()
+                    );
+
+            boolean confirmed =
+                    showCertificateConfirmation(cert);
+
+            if (!confirmed) {
+                return;
+            }
+
 
             CadastroService service = new CadastroService();
 
@@ -134,10 +172,105 @@ public class RegisterPanel extends JPanel {
             JOptionPane.showMessageDialog(this,
                     "Usuário cadastrado com sucesso");
 
+              txtCertPath.setText("");
+              txtKeyPath.setText("");
+              txtPassphrase.setText("");
+              txtPassword.setText("");
+              txtPasswordConfirm.setText("");
+
+
         } catch (Exception e) {
 
             JOptionPane.showMessageDialog(this,
                     e.getMessage());
         }
+    }
+
+    private boolean showCertificateConfirmation(X509Certificate cert)
+            throws Exception {
+
+        String subject =
+                formatX500Name(
+                        cert.getSubjectX500Principal()
+                                .getName(X500Principal.RFC1779)
+                );
+
+        String issuer =
+                formatX500Name(
+                        cert.getIssuerX500Principal()
+                                .getName(X500Principal.RFC1779)
+                );
+
+        String email = "";
+
+        Matcher matcher =
+                Pattern.compile(
+                                "(?:EMAILADDRESS|OID\\.1\\.2\\.840\\.113549\\.1\\.9\\.1)=([^,]+)"
+                        )
+                        .matcher(subject);
+
+        if (matcher.find()) {
+            email = matcher.group(1);
+        }
+
+        String message =
+                "Versão: " + cert.getVersion() + "\n\n" +
+                        "Série: " + cert.getSerialNumber() + "\n\n" +
+                        "Validade: " + cert.getNotBefore() +
+                        " até " + cert.getNotAfter() + "\n\n" +
+                        "Tipo de Assinatura: " + cert.getSigAlgName() + "\n\n" +
+                        "Emissor: " + extractCN(issuer) + "\n\n" +
+                        "Sujeito: " + extractCN(subject) + "\n\n" +
+                        "E-mail: " + email + "\n\n" +
+                        "Confirmar cadastro?";
+
+        int option =
+                JOptionPane.showConfirmDialog(
+                        this,
+                        message,
+                        "Confirmar Certificado",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+        return option == JOptionPane.YES_OPTION;
+    }
+
+    private static boolean hasConsecutiveRepeats(String senha, int count) {
+        for (int i = 0; i <= senha.length() - count; i++) {
+            char digit = senha.charAt(i);
+            boolean allSame = true;
+
+            for (int j = 1; j < count; j++) {
+                if (senha.charAt(i + j) != digit) {
+                    allSame = false;
+                    break;
+                }
+            }
+
+            if (allSame) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String formatX500Name(String name) {
+
+        return name.replace(
+                "OID.1.2.840.113549.1.9.1=",
+                "EMAILADDRESS="
+        );
+    }
+
+    private String extractCN(String x500Name) {
+
+        Matcher matcher =
+                Pattern.compile("CN=([^,]+)")
+                        .matcher(x500Name);
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return x500Name;
     }
 }

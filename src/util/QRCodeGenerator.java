@@ -40,7 +40,6 @@ public class QRCodeGenerator {
     }
 
     public static String generateOTPAuthURI(String issuer, String accountName, String secret) {
-        // otpauth://totp/ISSUER:ACCOUNT?secret=SECRET&issuer=ISSUER
         return String.format(
                 "otpauth://totp/%s:%s?secret=%s&issuer=%s",
                 urlEncode(issuer),

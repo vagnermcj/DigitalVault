@@ -222,7 +222,6 @@ public class ConsultPanel extends JPanel {
 
             LogService.registrar(7011, current.getUid(), record.getNome());
 
-            // Arquivos são assinados/envelopados com chaves do admin
             service.decryptSecretFile(
                     txtFolderPath.getText().trim(),
                     record,

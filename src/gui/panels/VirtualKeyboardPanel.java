@@ -10,10 +10,10 @@ import java.util.List;
 
 public class VirtualKeyboardPanel extends JPanel {
 
-    private List<int[]> clickedPairs; // Armazena pares clicados
+    private List<int[]> clickedPairs;
     private JButton[] buttons;
     private JLabel displayLabel;
-    private int[][] currentLayout; // Layout atual dos números
+    private int[][] currentLayout;
 
     public VirtualKeyboardPanel() {
         clickedPairs = new ArrayList<>();
@@ -21,12 +21,10 @@ public class VirtualKeyboardPanel extends JPanel {
 
         setLayout(new BorderLayout(10, 10));
 
-        // Display da senha (asteriscos)
         displayLabel = new JLabel("Senha: ", SwingConstants.CENTER);
         displayLabel.setFont(new Font("Monospaced", Font.BOLD, 18));
         add(displayLabel, BorderLayout.NORTH);
 
-        // Painel de botões
         JPanel buttonsPanel = new JPanel(new GridLayout(1, 5, 10, 10));
 
         for (int i = 0; i < 5; i++) {
@@ -39,50 +37,41 @@ public class VirtualKeyboardPanel extends JPanel {
 
         add(buttonsPanel, BorderLayout.CENTER);
 
-        // Botão limpar
         JButton clearButton = new JButton("Limpar");
         clearButton.addActionListener(e -> clear());
         add(clearButton, BorderLayout.SOUTH);
 
-        // Gerar layout inicial
         generateRandomLayout();
     }
 
     private void generateRandomLayout() {
-        // Criar lista com números 0-9
         List<Integer> numbers = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             numbers.add(i);
         }
         Collections.shuffle(numbers);
 
-        // Distribuir em 5 botões (2 números cada)
         currentLayout = new int[5][2];
         for (int i = 0; i < 5; i++) {
             currentLayout[i][0] = numbers.get(i * 2);
             currentLayout[i][1] = numbers.get(i * 2 + 1);
 
-            // Atualizar texto do botão
             buttons[i].setText(currentLayout[i][0] + "/" + currentLayout[i][1]);
         }
     }
 
     private void handleButtonClick(int buttonIndex) {
-        // Verificar tamanho máximo (10 dígitos)
         if (clickedPairs.size() >= 10) {
             JOptionPane.showMessageDialog(this,
                     "Senha deve ter no máximo 10 dígitos");
             return;
         }
 
-        // Registrar o par de números
         int[] pair = currentLayout[buttonIndex].clone();
         clickedPairs.add(pair);
 
-        // Atualizar display com asteriscos
         updateDisplay();
 
-        // Redistribuir números
         generateRandomLayout();
     }
 

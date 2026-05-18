@@ -32,10 +32,10 @@ public class UserPrivateKeyValidationService {
 
         Object[] fields = {
 
-                "Certificado (.pem):",
+                "Certificado :",
                 txtCert,
 
-                "Chave privada (.bin):",
+                "Chave privada :",
                 txtKey,
 
                 "Frase secreta:",

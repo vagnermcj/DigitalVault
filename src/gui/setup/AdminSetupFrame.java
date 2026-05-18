@@ -53,11 +53,11 @@ public class AdminSetupFrame extends JFrame {
         txtConfirm = new JPasswordField(30);
 
         addField(panel, gbc, row++,
-                "Certificado (.pem):",
+                "Certificado:",
                 txtCert);
 
         addField(panel, gbc, row++,
-                "Chave privada (.bin):",
+                "Chave privada:",
                 txtKey);
 
         addField(panel, gbc, row++,
@@ -110,18 +110,44 @@ public class AdminSetupFrame extends JFrame {
 
         try {
 
-            String password =
+            String senha =
                     new String(txtPassword.getPassword());
 
             String confirm =
                     new String(txtConfirm.getPassword());
 
-            if (!password.equals(confirm)) {
+            if (!senha.equals(confirm)) {
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Senhas não coincidem"
-                );
+                JOptionPane.showMessageDialog(this,
+                        "Senhas não coincidem");
+
+                return;
+            }
+            else if(hasConsecutiveRepeats(senha, 3))
+            {
+                JOptionPane.showMessageDialog(this,
+                        "Senha com sequência de numeros repetidos");
+
+                return;
+            }
+            else if(!senha.matches("\\d+"))
+            {
+                JOptionPane.showMessageDialog(this,
+                        "Senha deve possuir apenas digitos");
+
+                return;
+            }
+            else if(senha.isEmpty())
+            {
+                JOptionPane.showMessageDialog(this,
+                        "Senha deve possuir apenas digitos");
+
+                return;
+            }
+            else if(senha.length() < 8 || senha.length() > 10)
+            {
+                JOptionPane.showMessageDialog(this,
+                        "Senha deve ser entre 8 e 10 digitos");
 
                 return;
             }
@@ -133,7 +159,7 @@ public class AdminSetupFrame extends JFrame {
                     txtCert.getText(),
                     txtKey.getText(),
                     new String(txtPhrase.getPassword()),
-                    password,
+                    senha,
                     true
             );
 
@@ -150,6 +176,25 @@ public class AdminSetupFrame extends JFrame {
                     e.getMessage()
             );
         }
+    }
+
+    private static boolean hasConsecutiveRepeats(String senha, int count) {
+        for (int i = 0; i <= senha.length() - count; i++) {
+            char digit = senha.charAt(i);
+            boolean allSame = true;
+
+            for (int j = 1; j < count; j++) {
+                if (senha.charAt(i + j) != digit) {
+                    allSame = false;
+                    break;
+                }
+            }
+
+            if (allSame) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

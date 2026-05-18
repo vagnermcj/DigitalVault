@@ -57,7 +57,6 @@ public class TOTP {
     }
 
     public String generateCode() {
-        // Usar Date para obter timestamp atual
         long timeInterval = new Date().getTime() / 1000 / timeStepInSeconds;
         return TOTPCode(timeInterval);
     }

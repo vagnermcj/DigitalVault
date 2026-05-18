@@ -10,12 +10,10 @@ public class PasswordManager {
     private static final int BCRYPT_COST = 8;
 
     public static String hashPassword(String password) {
-        // Gerar salt de 16 bytes
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);
 
-        // Gerar hash bcrypt
         return OpenBSDBCrypt.generate(password.toCharArray(), salt, BCRYPT_COST);
     }
 

@@ -24,8 +24,8 @@ public class SystemStartupService {
         JPasswordField txtPhrase = new JPasswordField();
 
         Object[] fields = {
-                "Certificado (.pem):", txtCert,
-                "Chave privada (.bin):", txtKey,
+                "Certificado:", txtCert,
+                "Chave privada:", txtKey,
                 "Frase secreta:", txtPhrase
         };
 
